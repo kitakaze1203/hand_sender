@@ -12,11 +12,8 @@ public class Sender : MonoBehaviour
     private UdpClient udpClient;
     private Quaternion baseRotation = Quaternion.identity;
     [SerializeField] TextMeshProUGUI sending_IP;
-    private int motor1 = 0;
-    private int motor2 = 0;
-    private int motor3 = 0;
-    private int motor4 = 0;
-    private int motor5 = 0;
+    private int[] motor = new int[5];
+    private bool zflag = false;
     // Start is called before the first frame update
 
     void Start()
@@ -36,12 +33,16 @@ public class Sender : MonoBehaviour
             return;
         }
         sending_IP.text = $"{SceneChanger.remoteIp} ‚É‘—M’†...";
-        Quaternion q = baseRotation*Input.gyro.attitude;
+        if (zflag)
+        {
+            baseRotation = Quaternion.Inverse(Input.gyro.attitude);
+        }
+        Quaternion q = baseRotation * Input.gyro.attitude;
         Quaternion corQ = new Quaternion(q.x, q.z, q.y, -q.w);
 
         transform.localRotation = corQ;
 
-        string message = $"{corQ.x},{corQ.y},{corQ.z},{corQ.w},{motor1},{motor2},{motor3},{motor4},{motor5}";
+        string message = $"{corQ.x},{corQ.y},{corQ.z},{corQ.w},{motor[0]},{motor[1]},{motor[2]},{motor[3]},{motor[4]}";
         byte[] data = Encoding.UTF8.GetBytes(message);
         try
         {
@@ -57,17 +58,18 @@ public class Sender : MonoBehaviour
         udpClient.Send(data, data.Length, SceneChanger.remoteIp, port);
         udpClient.Close();
     }
-
-    public void OnMotor1() => motor1 = 1;
-    public void OffMotor1() => motor1 = 0;
-    public void RevMotor1() => motor1 = -1;
-    public void OnMotor2() => motor2 = 1;
-    public void OffMotor2() => motor2 = 0;
-    public void RevMotor2() => motor2 = -1;
-    public void OnMotor3() => motor3 = 1;
-    public void OffMotor3() => motor3 = 0;
-    public void OnMotor4() => motor4 = 1;
-    public void OffMotor4() => motor4 = 0;
-    public void OnMotor5() => motor5 = 1;
-    public void OffMotor5() => motor5 = 0;
+    public void OnMotor1() => motor[0] = 1;
+    public void OffMotor1() => motor[0] = 0;
+    public void RevMotor1() => motor[0] = -1;
+    public void OnMotor2() => motor[1] = 1;
+    public void OffMotor2() => motor[1] = 0;
+    public void RevMotor2() => motor[1] = -1;
+    public void OnMotor3() => motor[2] = 1;
+    public void OffMotor3() => motor[2] = 0;
+    public void OnMotor4() => motor[3] = 1;
+    public void OffMotor4() => motor[3] = 0;
+    public void OnMotor5() => motor[4] = 1;
+    public void OffMotor5() => motor[4] = 0;
+    public void OnResetZ() => zflag = true;
+    public void OffResetZ() => zflag = false;
 }
