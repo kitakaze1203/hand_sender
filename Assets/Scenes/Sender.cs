@@ -13,7 +13,8 @@ public class Sender : MonoBehaviour
     private Quaternion baseRotation = Quaternion.identity;
     [SerializeField] TextMeshProUGUI sending_IP;
     private int[] motor = new int[5];
-    private bool zflag = false;
+    private int air = 0;
+    private bool offflag = false;
     // Start is called before the first frame update
 
     void Start()
@@ -33,7 +34,7 @@ public class Sender : MonoBehaviour
             return;
         }
         sending_IP.text = $"{SceneChanger.remoteIp} ‚É‘—M’†...";
-        if (zflag)
+        if (offflag)
         {
             baseRotation = Quaternion.Inverse(Input.gyro.attitude);
         }
@@ -42,7 +43,7 @@ public class Sender : MonoBehaviour
 
         transform.localRotation = corQ;
 
-        string message = $"{corQ.x},{corQ.y},{corQ.z},{corQ.w},{motor[0]},{motor[1]},{motor[2]},{motor[3]},{motor[4]}";
+        string message = $"{corQ.x},{corQ.y},{corQ.z},{corQ.w},{motor[0]},{motor[1]},{motor[2]},{motor[3]},{motor[4]},{air}";
         byte[] data = Encoding.UTF8.GetBytes(message);
         try
         {
@@ -70,6 +71,8 @@ public class Sender : MonoBehaviour
     public void OffMotor4() => motor[3] = 0;
     public void OnMotor5() => motor[4] = 1;
     public void OffMotor5() => motor[4] = 0;
-    public void OnResetZ() => zflag = true;
-    public void OffResetZ() => zflag = false;
+    public void OnAir() => air = 1;
+    public void OffAir() => air = 0;
+    public void OnReset() => offflag = true;
+    public void OffReset() => offflag = false;
 }
